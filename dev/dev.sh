@@ -1,8 +1,7 @@
-#!/bin/bash
-CURRENT_DIR="$(dirname "$0")"
-#SCRIPT_NAME=$(basename "$0")
+#!/usr/bin/env bash
 SCRIPT_NAME="dev"
-source "$CURRENT_DIR/config.sh"
+CURRENT_DIR="$(dirname "$0")"
+#source "$CURRENT_DIR/.config.sh"
 
 
 ###############################################################################
@@ -145,35 +144,43 @@ fi
 # source replace-properties.sh "$WS_DIRNAME"
 ###############################################################################
 
+WS_PLANTILLAS_PATH="$WS_PATH_REGEX\/_shared/plantillas"
 WS_PROPERTIES_PATH="$WS_PATH_REGEX\/$WS_DIRNAME\/conf/properties"
 
 # FULL SERVER
 ###############################################################################
+echo "Configurando el servidor Was85 para usar los plantillas del workspace..."
+FULL_PLANTILLAS_REPLACE="<classpath>$WS_PLANTILLAS_PATH<\/classpath>"
+# Sustituir los plantillas iniciales del DEV (caso inicial)
+FULL_REGEX_DEV="<classpath>$DEV_PATH_REGEX[^<]*\/plantillas<\/classpath>"
+sed -i "s|$(echo "$FULL_REGEX_DEV")|$FULL_PLANTILLAS_REPLACE|g" $FULL_XML
+
 echo "Configurando el servidor Was85 para usar los properties del workspace..."
-
-FULL_FILE="$DEV_BASHPATH/TOOLS/WebSphere/AppServer/profiles/AppSrv01/config/cells/localhost/nodes/localhost/servers/server1/server.xml"
-FULL_REPLACE="<classpath>$WS_PROPERTIES_PATH<\/classpath>"
-
+FULL_PROPERTIES_REPLACE="<classpath>$WS_PROPERTIES_PATH<\/classpath>"
 # Sustituir los properties iniciales del DEV (caso inicial)
 FULL_REGEX_DEV="<classpath>$DEV_PATH_REGEX[^<]*\/properties<\/classpath>"
-sed -i "s|$(echo "$FULL_REGEX_DEV")|$FULL_REPLACE|g" $FULL_FILE
+sed -i "s|$(echo "$FULL_REGEX_DEV")|$FULL_PROPERTIES_REPLACE|g" $FULL_XML
 # Sustituir los properties al nuevo workspace (cambio de workspace)
 FULL_REGEX_WS="<classpath>$WS_PATH_REGEX\/[^<]*\/properties<\/classpath>"
-sed -i "s|$(echo "$FULL_REGEX_WS")|$FULL_REPLACE|g" $FULL_FILE
+sed -i "s|$(echo "$FULL_REGEX_WS")|$FULL_PROPERTIES_REPLACE|g" $FULL_XML
+
 
 # LIBERTY SERVER
 ###############################################################################
+echo "Configurando el servidor Liberty para usar las plantillas del workspace..."
+LIBERTY_PLANTILLAS_REPLACE="<folder dir=\"$WS_PLANTILLAS_PATH\"\/>"
+# Sustituir los properties iniciales del DEV (caso inicial)
+LIBERTY_REGEX_DEV="<folder dir=\"$DEV_PATH_REGEX[^>]*\/plantillas\"\/>"
+sed -i "s|$(echo "$LIBERTY_REGEX_DEV")|$LIBERTY_PLANTILLAS_REPLACE|g" $LIBERTY_XML
+
 echo "Configurando el servidor Liberty para usar los properties del workspace..."
-
-LIBERTY_FILE="$DEV_BASHPATH/TOOLS/WebSphere/Liberty/usr/servers/libertyLocal/server.xml"
-LIBERTY_REPLACE="<folder dir=\"$WS_PROPERTIES_PATH\"\/>"
-
+LIBERTY_PROPERTIES_REPLACE="<folder dir=\"$WS_PROPERTIES_PATH\"\/>"
 # Sustituir los properties iniciales del DEV (caso inicial)
 LIBERTY_REGEX_DEV="<folder dir=\"$DEV_PATH_REGEX[^>]*\/properties\"\/>"
-sed -i "s|$(echo "$LIBERTY_REGEX_DEV")|$LIBERTY_REPLACE|g" $LIBERTY_FILE
+sed -i "s|$(echo "$LIBERTY_REGEX_DEV")|$LIBERTY_PROPERTIES_REPLACE|g" $LIBERTY_XML
 # Sustituir los properties al nuevo workspace (cambio de workspace)
 LIBERTY_REGEX_WS="<folder dir=\"$WS_PATH_REGEX\/[^>]*\/properties\"\/>"
-sed -i "s|$(echo "$LIBERTY_REGEX_WS")|$LIBERTY_REPLACE|g" $LIBERTY_FILE
+sed -i "s|$(echo "$LIBERTY_REGEX_WS")|$LIBERTY_PROPERTIES_REPLACE|g" $LIBERTY_XML
 
 
 ###############################################################################
