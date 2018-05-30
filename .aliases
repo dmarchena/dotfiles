@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+alias home="cd ~/"
+alias dots="cd $DOTFILES_HOME"
+
+alias restart="exec ${SHELL} -l"
+
+# npm script runner
+# Syntax: 
+#   npr [scriptname] [suffix]
+# Examples: 
+#   npr build -> npm run build
+#   npr build desa -> npm run build:desa
+npr() { if [[ -z $2 ]]; then npm run $1; else npm run $1:$2; fi }
+
+alias npb="npr build $@"
+alias npl="npr lint $@"
+
+

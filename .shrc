@@ -1,0 +1,34 @@
+CURRENT_DIR="$(dirname "$0")"
+export DOTFILES_HOME="/d/Trabajo/dmarchena/.dotfiles"
+
+# Base vars
+source "$DOTFILES_HOME/.colors"
+
+# Platform
+platform(){
+    case ${OSTYPE//[0-9.-]*/} in
+        darwin) echo "macos";; #Mac
+        msys)   echo "win";; #Windows using git bash
+        linux)  echo "linux";;
+        *)      echo "Unknown Operating system $OSTYPE"; exit 1
+    esac
+}
+export os="$(platform)"
+source "$DOTFILES_HOME/.win"
+
+# Tools
+source "$DOTFILES_HOME/.aliases"
+source "$DOTFILES_HOME/.ide"
+source "$DOTFILES_HOME/.music"
+
+# Work time
+source "$DOTFILES_HOME/dev/.all"
+
+if [[ $os == "win" ]]; then
+    alias __svn_ps1="echo svn:$(svnurl)"
+    export PS1='\[\033]0;$TITLEPREFIX:$PWD\007\]\n\[\033[32m\]\u\[\033[0m\] \[\033[36m\]\w \[\033[33m\]`__git_ps1``__svn_ps1`\[\033[0m\]\n$ '
+    #export PS1='\[\033]0;$TITLEPREFIX:$PWD\007\]\n\[\033[32m\]\u\[\033[0m\] \[\033[36m\]\w \[\033[33m\]`git branch 2>/dev/null | cut -b 3-`\[\033[0m\]\n$ '
+fi
+
+
+

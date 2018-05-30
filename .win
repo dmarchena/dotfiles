@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+alias svnurl="svn info | while read -r line; do sed -rn 's/Relative URL: \^?(.*)/\1/p'; done"
+
 alias hosts="vim /c/Windows/System32/drivers/etc/hosts"
 
 brws() {
